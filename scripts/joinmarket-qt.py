@@ -1612,9 +1612,25 @@ class JMMainWindow(QMainWindow):
         else:
             event.ignore()
 
+    def resizeAndCenter(self):
+        # Resize the window base on the desktop size
+        default_width = 1000
+        default_height = 800
+
+        desktop_rect = QDesktopWidget().availableGeometry()
+        self.resize(
+            default_width if default_width < desktop_rect.width() - 100 else desktop_rect.width() - 100,
+            default_height if default_height < desktop_rect.height() - 100 else desktop_rect.height() - 100
+        )
+
+        # Center the window
+        window_rect = self.frameGeometry()
+        window_rect.moveCenter(desktop_rect.center())
+        self.move(window_rect.topLeft())
+
     def initUI(self):
         self.statusBar().showMessage("Ready")
-        self.setGeometry(300, 300, 250, 150)
+        self.resizeAndCenter()
         loadAction = QAction('&Load...', self)
         loadAction.setStatusTip('Load wallet from file')
         loadAction.triggered.connect(self.selectWallet)
@@ -2349,7 +2365,6 @@ tabWidget.addTab(SpendTab(), "Coinjoins")
 tabWidget.addTab(TxHistoryTab(), "Tx History")
 tabWidget.addTab(CoinsTab(), "Coins")
 
-mainWindow.resize(600, 500)
 if get_network() == 'testnet':
     suffix = ' - Testnet'
 elif get_network() == 'signet':
